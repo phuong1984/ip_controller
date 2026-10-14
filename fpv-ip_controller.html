@@ -94,7 +94,7 @@
     border-radius: 4px;
   }
 
-  #cam { width: 100%; height: 100%; object-fit: cover; visibility: hidden; }
+  #cam { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; visibility: hidden; }
 
   #cam-fallback {
     position: absolute;
@@ -538,6 +538,9 @@ document.getElementById("ip-robot").textContent = ROBOT_IP;
 
 const camImg = document.getElementById("cam");
 const camFallback = document.getElementById("cam-fallback");
+const stage = document.getElementById("stage");
+const share = document.getElementById("share");
+const options = document.getElementById("options");
 const dotCam = document.getElementById("dot-cam");
 const cameraSettingsButton = document.getElementById("camera-settings-button");
 const cameraSettingsOverlay = document.getElementById("camera-settings-overlay");
@@ -550,6 +553,7 @@ const cameraSettingsError = document.getElementById("camera-settings-error");
 let cameraIp = DEFAULT_CAMERA_IP;
 let cameraPort = DEFAULT_CAMERA_PORT;
 let cameraReachable = null;
+let cameraRetryTimer = null;
 
 try {
   const savedSettings = JSON.parse(localStorage.getItem(CAMERA_SETTINGS_KEY) || "null");
@@ -586,12 +590,16 @@ function updateCameraSettingsForm() {
 }
 
 function startStream() {
+  clearTimeout(cameraRetryTimer);
+  cameraRetryTimer = null;
+  camImg.style.visibility = "hidden";
+  camFallback.textContent = "Đang kết nối camera...";
+  camFallback.classList.remove("hidden");
   camImg.src = cameraStreamUrl() + "?t=" + Date.now();
 }
 
 function setCameraConnection(connected) {
   if (cameraReachable === connected) return;
-  const wasReachable = cameraReachable;
   cameraReachable = connected;
   dotCam.classList.toggle("ok", connected);
 
@@ -602,50 +610,72 @@ function setCameraConnection(connected) {
     return;
   }
 
-  camFallback.textContent = "Đang kết nối camera...";
-  camFallback.classList.remove("hidden");
-  if (wasReachable === false) {
-    camImg.style.visibility = "hidden";
-    startStream();
-  } else if (camImg.complete && camImg.naturalWidth > 0) {
-    camImg.style.visibility = "visible";
-    camFallback.classList.add("hidden");
-  }
-}
-
-async function checkCamHealth() {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2500);
-  try {
-    await fetch(`${cameraStreamUrl()}?health=${Date.now()}`, {
-      mode: "no-cors",
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    setCameraConnection(true);
-  } catch (error) {
-    setCameraConnection(false);
-  } finally {
-    clearTimeout(timeoutId);
-    controller.abort();
-  }
+  camImg.style.visibility = "visible";
+  camFallback.classList.add("hidden");
 }
 
 camImg.onload = () => {
-  if (cameraReachable) {
-    camImg.style.visibility = "visible";
-    camFallback.classList.add("hidden");
-  }
+  setCameraConnection(true);
 };
 
 camImg.onerror = () => {
   setCameraConnection(false);
+  if (cameraRetryTimer === null) {
+    cameraRetryTimer = setTimeout(startStream, 2000);
+  }
 };
+
+const STAGE_TOP = 28;
+let stageAspect = "";
+let stagePollTimer = null;
+
+function applyStageFit(displayWidth, displayHeight) {
+  if (!displayWidth || !displayHeight) return;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const maxW = Math.min(340, vw * 0.40);
+  const maxH = Math.min(200, vh * 0.44);
+  const aspect = displayWidth / displayHeight;
+  let w = maxW;
+  let h = maxW / aspect;
+  if (h > maxH) {
+    h = maxH;
+    w = maxH * aspect;
+  }
+  w = Math.round(w);
+  h = Math.round(h);
+  stage.style.width = `${w}px`;
+  stage.style.height = `${h}px`;
+  const halfButton = Math.min(90, vw * 0.20, vh * 0.20) / 2;
+  const buttonTop = Math.round(STAGE_TOP + h + 12 + halfButton);
+  share.style.top = `${buttonTop}px`;
+  options.style.top = `${buttonTop}px`;
+}
+
+function fitStageToStream() {
+  fetch(`http://${cameraIp}:${cameraPort}/status`)
+    .then(response => (response.ok ? response.json() : null))
+    .then(status => {
+      if (!status || status.running === false) return;
+      const nextAspect = `${status.displayWidth}x${status.displayHeight}`;
+      if (nextAspect === stageAspect) return;
+      stageAspect = nextAspect;
+      applyStageFit(status.displayWidth, status.displayHeight);
+    })
+    .catch(() => {});
+}
+
+function startStagePolling() {
+  clearInterval(stagePollTimer);
+  fitStageToStream();
+  stagePollTimer = setInterval(fitStageToStream, 1000);
+}
+
+window.addEventListener("resize", fitStageToStream);
 
 updateCameraSettingsForm();
 startStream();
-checkCamHealth();
-setInterval(checkCamHealth, 3000);
+startStagePolling();
 
 function openCameraSettings() {
   updateCameraSettingsForm();
@@ -701,9 +731,9 @@ cameraSettingsForm.addEventListener("submit", event => {
 
   cameraIp = nextIp;
   cameraPort = nextPort;
-  updateCameraSettingsForm();
+  cameraReachable = null;
   dotCam.classList.remove("ok");
-  camFallback.classList.remove("hidden");
+  updateCameraSettingsForm();
   closeCameraSettings();
   startStream();
 });
