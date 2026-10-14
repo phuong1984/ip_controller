@@ -209,7 +209,7 @@ class IPController:
 
     # ---------------- SERVER ----------------
 
-    def start_server(self, port=PORT):
+    def start_server(self):
         """Mo cong cho trang dieu khien. Tra ve True neu thanh cong."""
         if self.sock is not None:
             try:
@@ -220,7 +220,7 @@ class IPController:
 
         server_sock = None
         try:
-            addr = socket.getaddrinfo("0.0.0.0", port)[0][-1]
+            addr = socket.getaddrinfo("0.0.0.0", PORT)[0][-1]
             server_sock = socket.socket()
             server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             server_sock.bind(addr)
@@ -233,14 +233,14 @@ class IPController:
                 except Exception:
                     pass
             self.sock = None
-            print("Khong mo duoc cong", port, "-", error)
+            print("Khong mo duoc cong", PORT, "-", error)
             print("Cong dang bi chiem. Hay reset robot roi chay lai,")
-            print("hoac doi cong o block 'mo may chu dieu khien' va sua PORT trong html.")
+            print("May chu dieu khien su dung co dinh cong", PORT, ".")
             return False
 
         self.sock = server_sock
         self._reset_joystick_stats()
-        print("May chu dieu khien da mo, cong", port)
+        print("May chu dieu khien da mo, cong", PORT)
         return True
 
     def process(self):

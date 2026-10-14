@@ -19,8 +19,8 @@ Blockly.Msg.IP_CONTROLLER_BUTTON_RELEASED = 'được thả';
 
 Blockly.Msg.IP_CONTROLLER_CONNECT_WIFI_MESSAGE = 'kết nối Wi-Fi tên %1 mật khẩu %2';
 Blockly.Msg.IP_CONTROLLER_CONNECT_WIFI_TOOLTIP = 'Nhập tên và mật khẩu Wi-Fi. Để trống nếu không cần kết nối Wi-Fi.';
-Blockly.Msg.IP_CONTROLLER_START_SERVER_MESSAGE = 'mở máy chủ điều khiển cổng %1';
-Blockly.Msg.IP_CONTROLLER_START_SERVER_TOOLTIP = 'Mở cổng chờ lệnh từ trang điều khiển. Gọi sau khi kết nối Wi-Fi.';
+Blockly.Msg.IP_CONTROLLER_START_SERVER_MESSAGE = 'mở máy chủ điều khiển';
+Blockly.Msg.IP_CONTROLLER_START_SERVER_TOOLTIP = 'Mở máy chủ điều khiển trên cổng cố định 80. Gọi sau khi kết nối Wi-Fi.';
 Blockly.Msg.IP_CONTROLLER_IS_CONNECTED_MESSAGE = 'đã kết nối Wi-Fi?';
 Blockly.Msg.IP_CONTROLLER_IS_CONNECTED_TOOLTIP = 'Đúng nếu robot đang kết nối Wi-Fi.';
 Blockly.Msg.IP_CONTROLLER_GET_IP_MESSAGE = 'địa chỉ IP của robot';

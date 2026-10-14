@@ -19,8 +19,8 @@ Blockly.Msg.IP_CONTROLLER_BUTTON_RELEASED = 'is released';
 
 Blockly.Msg.IP_CONTROLLER_CONNECT_WIFI_MESSAGE = 'connect to Wi-Fi SSID %1 password %2';
 Blockly.Msg.IP_CONTROLLER_CONNECT_WIFI_TOOLTIP = 'Enter the Wi-Fi name and password. Leave them empty if no Wi-Fi connection is needed.';
-Blockly.Msg.IP_CONTROLLER_START_SERVER_MESSAGE = 'start control server on port %1';
-Blockly.Msg.IP_CONTROLLER_START_SERVER_TOOLTIP = 'Open a port for commands from the controller page. Call after connecting to Wi-Fi.';
+Blockly.Msg.IP_CONTROLLER_START_SERVER_MESSAGE = 'start control server';
+Blockly.Msg.IP_CONTROLLER_START_SERVER_TOOLTIP = 'Open the control server on fixed port 80. Call after connecting to Wi-Fi.';
 Blockly.Msg.IP_CONTROLLER_IS_CONNECTED_MESSAGE = 'Wi-Fi connected?';
 Blockly.Msg.IP_CONTROLLER_IS_CONNECTED_TOOLTIP = 'True if the robot is connected to Wi-Fi.';
 Blockly.Msg.IP_CONTROLLER_GET_IP_MESSAGE = 'robot IP address';

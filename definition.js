@@ -99,13 +99,7 @@ Blockly.Blocks['ip_start_server'] = {
       {
         "type": "ip_start_server",
         "message0": Blockly.Msg.IP_CONTROLLER_START_SERVER_MESSAGE,
-        "args0": [
-          {
-            "type": "input_value",
-            "name": "port",
-            "check": "Number",
-          }
-        ],
+        "args0": [],
         "inputsInline": true,
         "previousStatement": null,
         "nextStatement": null,
@@ -119,9 +113,7 @@ Blockly.Blocks['ip_start_server'] = {
 
 Blockly.Python["ip_start_server"] = function (block) {
   ipDeclareImport();
-  var port = Blockly.Python.valueToCode(block, 'port', Blockly.Python.ORDER_ATOMIC);
-  // TODO: Assemble Python into code variable.
-  var code = "ip_ctrl.start_server(" + port + ")\n";
+  var code = "ip_ctrl.start_server()\n";
   return code;
 };
 
