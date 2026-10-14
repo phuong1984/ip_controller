@@ -1,0 +1,46 @@
+<xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+  <category name="%{BKY_IP_CONTROLLER_CATEGORY}" colour="#44cbc6" icon="wifi">
+    <block type="ip_connect_wifi">
+      <field name="SSID"></field>
+      <field name="PASS"></field>
+    </block>
+
+    <block type="ip_start_server">
+      <value name="port">
+        <shadow type="math_number">
+          <field name="NUM">80</field>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="ip_is_connected"></block>
+
+    <block type="ip_get_ip"></block>
+
+    <sep gap="30"></sep>
+    <label text="%{BKY_IP_CONTROLLER_SIGNALS_LABEL}" web-class="blockLabelStyle"></label>
+
+    <block type="ip_process"></block>
+
+    <block type="ip_has_signal"></block>
+
+    <block type="ip_signal_name"></block>
+
+    <block type="ip_signal_x"></block>
+
+    <block type="ip_signal_y"></block>
+
+    <block type="ip_clear_signal"></block>
+
+    <sep gap="30"></sep>
+    <label text="%{BKY_IP_CONTROLLER_EVENTS_LABEL}" web-class="blockLabelStyle"></label>
+
+    <block type="ip_on_button"></block>
+
+    <block type="ip_on_joystick_move"></block>
+
+    <block type="ip_on_joystick_center"></block>
+
+    <block type="ip_on_ping"></block>
+  </category>
+</xml>
