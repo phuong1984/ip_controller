@@ -750,8 +750,8 @@ setInterval(() => {
   joystickStatsTick = now;
 }, 1000);
 
-function enqueueControl(path, isJoystick = false){
-  controlQueue.push({ path, isJoystick });
+function enqueueControl(path, isJoystick = false, onSuccess = null){
+  controlQueue.push({ path, isJoystick, onSuccess });
   pumpControlQueue();
 }
 
@@ -773,6 +773,13 @@ async function pumpControlQueue(){
       if (item.isJoystick) joystickStats.retries++;
     } else if (response.ok) {
       if (item.isJoystick) joystickStats.replied++;
+      if (item.onSuccess) {
+        try {
+          item.onSuccess();
+        } catch (error) {
+          console.error("Không phát được âm thanh xác nhận joystick.", error);
+        }
+      }
     } else if (item.isJoystick) {
       joystickStats.failed++;
     }
@@ -849,15 +856,17 @@ function setupJoystick(containerId, joyId){
   let currentX = 0;
   let currentY = 0;
   let loopInterval = null;
+  let startSoundPlayed = false;
+  let dragSession = 0;
 
   function updateKnob(dx, dy){
     knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
   }
 
-  function sendJoystick(x, y){
+  function sendJoystick(x, y, onSuccess = null){
     const seq = ++nextControlSeq;
     joystickStats.sampled++;
-    enqueueControl(`/joystick?id=${joyId}&x=${x}&y=${y}&seq=${seq}`, true);
+    enqueueControl(`/joystick?id=${joyId}&x=${x}&y=${y}&seq=${seq}`, true, onSuccess);
   }
 
   function handleMove(clientX, clientY){
@@ -888,10 +897,17 @@ function setupJoystick(containerId, joyId){
   container.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     dragging = true;
+    startSoundPlayed = false;
+    const session = ++dragSession;
+    initAudio();
     try { container.setPointerCapture(e.pointerId); } catch(err) {}
 
     handleMove(e.clientX, e.clientY);
-    sendJoystick(currentX, currentY);
+    sendJoystick(currentX, currentY, () => {
+      if (session !== dragSession || startSoundPlayed) return;
+      startSoundPlayed = true;
+      playSoundPress();
+    });
 
     stopLoop();
     loopInterval = setInterval(() => {
@@ -916,7 +932,7 @@ function setupJoystick(containerId, joyId){
     currentY = 0;
     updateKnob(0, 0);
 
-    sendJoystick(0, 0);
+    sendJoystick(0, 0, playSoundRelease);
   }
 
   window.addEventListener("pointerup", endDrag);

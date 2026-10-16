@@ -1,9 +1,8 @@
 # IP controller
 
-Điều khiển robot từ trình duyệt qua WiFi. Trang điều khiển gửi lệnh
+Điều khiển robot từ trình duyệt qua WiFi. Trang điều khiển (html) gửi lệnh
 HTTP tới robot, robot xử lý trong khối `lặp vô hạn` của chương trình.
-Các khối điều khiển servo được cung cấp riêng trong extension
-`xbot_servo_controller`.
+
 
 ## Thứ tự khối trong chương trình
 
