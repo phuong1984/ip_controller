@@ -574,7 +574,7 @@ function startStream() {
   camImg.style.visibility = "hidden";
   camFallback.textContent = "Đang kết nối camera...";
   camFallback.classList.remove("hidden");
-  camImg.src = cameraStreamUrl() + "?t=" + Date.now();
+  camImg.src = cameraStreamUrl();
 }
 
 function setCameraConnection(connected) {
